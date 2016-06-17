@@ -2,15 +2,13 @@
 
 function solve($minesweeperBoard)
 {
-    $minesweeperBoard = array_values(array_filter(explode("\n", $minesweeperBoard), function ($line) {
-        return !empty($line);
-    }));
+    $minesweeperBoard = array_map('str_split', explode("\n", trim($minesweeperBoard)));
+
+    validateBoardDimensions($minesweeperBoard);
 
     validateBorders($minesweeperBoard);
 
-    validateBoardSize($minesweeperBoard);
-
-    $grid = extractGrid($minesweeperBoard);
+    $grid = removeBorders($minesweeperBoard);
 
     validateGridSize($grid);
 
@@ -32,41 +30,40 @@ function solve($minesweeperBoard)
 
 function validateBorders($board)
 {
-    $topBorder = array_shift($board);
+    $topBorder = current(array_slice($board, 0, 1));
+    $middle = array_slice($board, 1, -1);
+    $bottomBorder = current(array_slice($board, 0, 1));
 
-    validateLineStartsAndEndsWith($topBorder, '+');
+    validateArrayStartsAndEndsWith($topBorder, '+');
+    validateArrayStartsAndEndsWith($bottomBorder, '+');
 
-    foreach (str_split(substr($topBorder, 1, -1)) as $border) {
+    foreach (array_slice($topBorder, 1, -1) as $border) {
         if ($border !== '-') {
             throw new InvalidArgumentException('Top border is incomplete');
         }
     }
 
-    $bottomBorder = array_pop($board);
-
-    validateLineStartsAndEndsWith($bottomBorder, '+');
-
-    foreach (str_split(substr($bottomBorder, 1, -1)) as $border) {
+    foreach (array_slice($bottomBorder, 1, -1) as $border) {
         if ($border !== '-') {
             throw new InvalidArgumentException('Bottom border is incomplete');
         }
     }
 
-    foreach ($board as $line) {
-        validateLineStartsAndEndsWith($line, '|');
+    foreach ($middle as $line) {
+        validateArrayStartsAndEndsWith($line, '|');
     }
 }
 
-function validateLineStartsAndEndsWith($line, $char)
+function validateArrayStartsAndEndsWith($line, $char)
 {
-    if (substr($line, 0, 1) !== $char
-        || substr($line, -1) !== $char
+    if ($line[0] !== $char
+        || $line[count($line) - 1] !== $char
     ) {
-        throw new InvalidArgumentException('Invalid edge' . $line . ' ' . $char);
+        throw new InvalidArgumentException('Invalid edge' . implode($line) . ' ' . $char);
     }
 }
 
-function extractGrid($minesweeperBoard)
+function removeBorders($minesweeperBoard)
 {
     array_shift($minesweeperBoard);
     array_pop($minesweeperBoard);
@@ -74,7 +71,7 @@ function extractGrid($minesweeperBoard)
     $grid = [];
 
     foreach ($minesweeperBoard as $line) {
-        $grid[] = str_split(substr($line, 1, -1));
+        $grid[] = (array_slice($line, 1, -1));
     }
 
     return $grid;
@@ -87,11 +84,11 @@ function validateGridSize($grid)
     }
 }
 
-function validateBoardSize($board)
+function validateBoardDimensions($board)
 {
-    $topRowWidth = strlen($board[0]);
+    $topRowWidth = count($board[0]);
     foreach ($board as $line) {
-        if (strlen($line) !== $topRowWidth) {
+        if (count($line) !== $topRowWidth) {
             throw new InvalidArgumentException('Your rows are not of equal length');
         }
     }
