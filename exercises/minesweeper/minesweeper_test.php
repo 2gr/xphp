@@ -6,21 +6,21 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 {
     public function testAnEmptyBoard()
     {
-        $emptyBoard = [
-            '+--+',
-            '|  |',
-            '+--+',
-        ];
+        $emptyBoard = '
++--+
+|  |
++--+
+';
         $this->assertSame($emptyBoard, solve($emptyBoard));
     }
 
     public function testAnIncompleteSideBorderThrowsAnException()
     {
-        $incompleteBoard = [
-            '+--+',
-            '|   ',
-            '+--+',
-        ];
+        $incompleteBoard = '
++--+
+   |
++--+
+';
         $this->setExpectedException('InvalidArgumentException');
 
         solve($incompleteBoard);
@@ -28,11 +28,11 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testAnIncompleteTopBorderThrowsAnException()
     {
-        $incompleteBoard = [
-            '+ -+',
-            '|  |',
-            '+--+',
-        ];
+        $incompleteBoard = '
++ -+
+|  |
++--+
+';
         $this->setExpectedException('InvalidArgumentException');
 
         solve($incompleteBoard);
@@ -40,11 +40,11 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testAMissingCornerThrowsAnException()
     {
-        $incompleteBoard = [
-            '+--',
-            '|  |',
-            '+--+',
-        ];
+        $incompleteBoard = '
++--
+|  |
++--+
+';
         $this->setExpectedException('InvalidArgumentException');
 
         solve($incompleteBoard);
@@ -52,11 +52,11 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testABoardWithLessThan2SquaresThrowsAnException()
     {
-        $tinyBoard = [
-            '+-+',
-            '| |',
-            '+-+',
-        ];
+        $tinyBoard = '
++-+
+| |
++-+
+';
         $this->setExpectedException('InvalidArgumentException');
 
         solve($tinyBoard);
@@ -64,12 +64,12 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testRowsOfSameLength($value = '')
     {
-        $unequalBoard = [
-            '+---+',
-            '|   |',
-            '| |',
-            '+---+',
-        ];
+        $unequalBoard = '
++---+
+|   |
+| |
++---+
+';
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -78,13 +78,13 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testCanOnlyContainMines($value = '')
     {
-        $badBoard = [
-            '+---+',
-            '|  *|',
-            '| * |',
-            '| ? |',
-            '+---+',
-        ];
+        $badBoard = '
++---+
+|  *|
+| * |
+| ? |
++---+
+';
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -93,95 +93,95 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testBoardWithOneMineToLeft()
     {
-        $oneMine = [
-            '+--+',
-            '|* |',
-            '+--+',
-        ];
+        $oneMine = '
++--+
+|* |
++--+
+';
 
-        $expected = [
-            '+--+',
-            '|*1|',
-            '+--+',
-        ];
+        $expected = '
++--+
+|*1|
++--+
+';
 
         $this->assertEquals($expected, solve($oneMine));
     }
 
     public function testBoardWithOneMineToRight()
     {
-        $oneMine = [
-            '+--+',
-            '| *|',
-            '+--+',
-        ];
+        $oneMine = '
++--+
+| *|
++--+
+';
 
-        $expected = [
-            '+--+',
-            '|1*|',
-            '+--+',
-        ];
+        $expected = '
++--+
+|1*|
++--+
+';
 
         $this->assertEquals($expected, solve($oneMine));
     }
 
     public function testBoardWithAMineToTopAndRight()
     {
-        $twoMines = [
-            '+--+',
-            '|* |',
-            '| *|',
-            '+--+',
-        ];
+        $twoMines = '
++--+
+|* |
+| *|
++--+
+';
 
-        $expected = [
-            '+--+',
-            '|*2|',
-            '|2*|',
-            '+--+',
-        ];
+        $expected = '
++--+
+|*2|
+|2*|
++--+
+';
 
         $this->assertEquals($expected, solve($twoMines));
     }
 
     public function testBoardWithAMineToBottomAndLeftAndDiagonal()
     {
-        $threeMines = [
-            '+--+',
-            '|* |',
-            '|**|',
-            '+--+',
-        ];
+        $threeMines = '
++--+
+|* |
+|**|
++--+
+';
 
-        $expected = [
-            '+--+',
-            '|*3|',
-            '|**|',
-            '+--+',
-        ];
+        $expected = '
++--+
+|*3|
+|**|
++--+
+';
 
         $this->assertEquals($expected, solve($threeMines));
     }
 
     public function testAComplicatedBoard()
     {
-        $threeMines = [
-            '+-----+',
-            '| * * |',
-            '|  *  |',
-            '|  *  |',
-            '|     |',
-            '+-----+',
-        ];
+        $threeMines = '
++-----+
+| * * |
+|  *  |
+|  *  |
+|     |
++-----+
+';
 
-        $expected = [
-            '+-----+',
-            '|1*3*1|',
-            '|13*31|',
-            '| 2*2 |',
-            '| 111 |',
-            '+-----+',
-        ];
+        $expected = '
++-----+
+|1*3*1|
+|13*31|
+| 2*2 |
+| 111 |
++-----+
+';
 
         $this->assertEquals($expected, solve($threeMines));
     }

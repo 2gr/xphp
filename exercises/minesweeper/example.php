@@ -2,6 +2,10 @@
 
 function solve($minesweeperBoard)
 {
+    $minesweeperBoard = array_values(array_filter(explode("\n", $minesweeperBoard), function ($line) {
+        return !empty($line);
+    }));
+
     validateBorders($minesweeperBoard);
 
     validateBoardSize($minesweeperBoard);
@@ -23,7 +27,7 @@ function solve($minesweeperBoard)
         }
     }
 
-    return applyBorders($grid);
+    return "\n" . implode("\n", applyBorders($grid)) . "\n";
 }
 
 function validateBorders($board)
