@@ -14,18 +14,9 @@ function solve($minesweeperBoard)
 
     validateContainsOnlyMines($grid);
 
-    foreach ($grid as $r => &$row) {
-        foreach ($row as $c => &$cell) {
-            if ($cell == '*') {
-                continue;
-            }
-            if ($cell == ' ') {
-                $cell = numSurroundingMines($grid, $r, $c);
-            }
-        }
-    }
+    $gridWithResults = addMineCount($grid);
 
-    return "\n" . implode("\n", applyBorders($grid)) . "\n";
+    return "\n" . implode("\n", applyBorders($gridWithResults)) . "\n";
 }
 
 function validateBorders($board)
@@ -151,4 +142,19 @@ function numSurroundingMines($grid, $r, $c)
         $mines += 1;
     }
     return $mines > 0 ? $mines : ' ';
+}
+
+function addMineCount($grid)
+{
+    foreach ($grid as $r => &$row) {
+        foreach ($row as $c => &$cell) {
+            if ($cell == '*') {
+                continue;
+            }
+            if ($cell == ' ') {
+                $cell = numSurroundingMines($grid, $r, $c);
+            }
+        }
+    }
+    return $grid;
 }
