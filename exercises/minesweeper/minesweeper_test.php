@@ -185,5 +185,4 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, solve($fourMines));
     }
-
 }
