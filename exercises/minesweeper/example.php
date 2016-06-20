@@ -2,7 +2,7 @@
 
 function solve($minesweeperBoard)
 {
-    $minesweeperBoard = array_map('str_split', explode("\n", trim($minesweeperBoard)));
+    $minesweeperBoard = makeBoardFromString($minesweeperBoard);
 
     validateBoardDimensions($minesweeperBoard);
 
@@ -16,7 +16,27 @@ function solve($minesweeperBoard)
 
     $gridWithResults = addMineCount($grid);
 
-    return "\n" . implode("\n", applyBorders($gridWithResults)) . "\n";
+    return makeStringFromBoard(applyBorders($gridWithResults));
+}
+
+function makeBoardFromString($string)
+{
+    return array_map('str_split', explode("\n", trim($string)));
+}
+
+function makeStringFromBoard($board)
+{
+    return "\n" . implode("\n", $board) . "\n";
+}
+
+function validateBoardDimensions($board)
+{
+    $topRowWidth = count($board[0]);
+    foreach ($board as $line) {
+        if (count($line) !== $topRowWidth) {
+            throw new InvalidArgumentException('Your rows are not of equal length');
+        }
+    }
 }
 
 function validateBorders($board)
@@ -45,12 +65,10 @@ function validateBorders($board)
     }
 }
 
-function validateArrayStartsAndEndsWith($line, $char)
+function validateArrayStartsAndEndsWith($arr, $char)
 {
-    if ($line[0] !== $char
-        || $line[count($line) - 1] !== $char
-    ) {
-        throw new InvalidArgumentException('Invalid edge' . implode($line) . ' ' . $char);
+    if (array_shift($arr) !== $char || array_pop($arr) !== $char) {
+        throw new InvalidArgumentException('Invalid edge' . implode($arr) . ' ' . $char);
     }
 }
 
@@ -59,29 +77,15 @@ function removeBorders($minesweeperBoard)
     array_shift($minesweeperBoard);
     array_pop($minesweeperBoard);
 
-    $grid = [];
-
-    foreach ($minesweeperBoard as $line) {
-        $grid[] = (array_slice($line, 1, -1));
-    }
-
-    return $grid;
+    return array_map(function ($line) {
+        return array_slice($line, 1, -1);
+    }, $minesweeperBoard);
 }
 
 function validateGridSize($grid)
 {
     if (count($grid[0]) < 2 && count($grid) < 2) {
         throw new InvalidArgumentException('Your grid is too small. Must be at least 2 squares');
-    }
-}
-
-function validateBoardDimensions($board)
-{
-    $topRowWidth = count($board[0]);
-    foreach ($board as $line) {
-        if (count($line) !== $topRowWidth) {
-            throw new InvalidArgumentException('Your rows are not of equal length');
-        }
     }
 }
 
@@ -116,32 +120,25 @@ function applyBorders($grid)
 
 function numSurroundingMines($grid, $r, $c)
 {
-    $mines = 0;
-    if (isset($grid[$r][$c - 1]) && $grid[$r][$c - 1] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r][$c + 1]) && $grid[$r][$c + 1] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r - 1][$c]) && $grid[$r - 1][$c] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r + 1][$c]) && $grid[$r + 1][$c] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r - 1][$c - 1]) && $grid[$r - 1][$c - 1] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r + 1][$c - 1]) && $grid[$r + 1][$c - 1] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r - 1][$c + 1]) && $grid[$r - 1][$c + 1] == '*') {
-        $mines += 1;
-    }
-    if (isset($grid[$r + 1][$c + 1]) && $grid[$r + 1][$c + 1] == '*') {
-        $mines += 1;
-    }
-    return $mines > 0 ? $mines : ' ';
+    $positions = [
+        [-1, -1],
+        [-1, 0],
+        [-1, 1],
+        [0, -1],
+        [0, 1],
+        [1, -1],
+        [1, 0],
+        [1, 1],
+    ];
+
+    return array_reduce($positions, function ($mines, $offset) use ($grid, $r, $c) {
+        $r = $r + $offset[0];
+        $c = $c + $offset[1];
+        if (isset($grid[$r][$c]) && $grid[$r][$c] == '*') {
+            $mines += 1;
+        }
+        return $mines;
+    }) ?: ' ';
 }
 
 function addMineCount($grid)

@@ -165,7 +165,7 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 
     public function testAComplicatedBoard()
     {
-        $threeMines = '
+        $fourMines = '
 +-----+
 | * * |
 |  *  |
@@ -183,7 +183,7 @@ class MinesweeperTest extends PHPUnit_Framework_TestCase
 +-----+
 ';
 
-        $this->assertEquals($expected, solve($threeMines));
+        $this->assertEquals($expected, solve($fourMines));
     }
 
 }
